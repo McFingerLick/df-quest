@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Force Quest Item Tracker</title>
+    <title>Delta Force Tracker</title>
     <!-- Load React -->
     <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
@@ -80,6 +80,19 @@
             const [search, setSearch] = React.useState('');
             const [filter, setFilter] = React.useState('all');
             const [showSaveAlert, setShowSaveAlert] = React.useState(false);
+            const [openSections, setOpenSections] = React.useState({});
+
+            // Effect to auto-open sections with search matches
+            React.useEffect(() => {
+                const newOpenSections = {};
+                Object.entries(inventory).forEach(([category, items]) => {
+                    const hasMatch = items.some(item =>
+                        item.name.toLowerCase().includes(search.toLowerCase())
+                    );
+                    newOpenSections[category] = hasMatch || !search;
+                });
+                setOpenSections(newOpenSections);
+            }, [search, inventory]);
 
             const saveToLocalStorage = (data) => {
                 localStorage.setItem('inventory', JSON.stringify(data));
@@ -250,9 +263,30 @@
                         }[category] || 'bg-gray-100';
 
                         return (
-                            <div key={category} className={`mb-6 p-4 rounded-lg ${categoryColor}`}>
-                                <h2 className="text-xl font-semibold mb-4 capitalize">{category} Items</h2>
-                                <div className="space-y-4">
+                            <div key={category} className={`mb-6 rounded-lg ${categoryColor}`}>
+                                <div 
+                                    className="p-4 flex items-center justify-between cursor-pointer"
+                                    onClick={() => setOpenSections(prev => ({
+                                        ...prev,
+                                        [category]: !prev[category]
+                                    }))}
+                                >
+                                    <div className="flex items-center">
+                                        <svg 
+                                            className={`w-4 h-4 mr-2 transition-transform ${openSections[category] ? '' : '-rotate-90'}`}
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                        <h2 className="text-xl font-semibold capitalize">{category} Items</h2>
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        {filteredItems.length} items
+                                    </div>
+                                </div>
+                                <div className={`space-y-4 px-4 pb-4 ${openSections[category] ? '' : 'hidden'}`}>
                                     {filteredItems.map((item, index) => (
                                         <div
                                             key={item.name}
