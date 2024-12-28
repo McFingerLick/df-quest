@@ -1,147 +1,94 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-
-const InventoryTracker = () => {
-  const initialInventory = {
-    common: [
-      { name: 'Lithium Battery', required: 3 },
-      { name: 'LED Light', required: 2 },
-      { name: 'Printed Circuit Board', required: 3 },
-    ],
-    blue: [
-      { name: 'Bucket of Paint', required: 5 },
-      { name: 'Basic Ammo Production Part', required: 3 },
-      { name: 'Intel Recorder', required: 1 },
-      { name: 'Socket Adapter', required: 3 },
-      { name: 'Military Power Bank', required: 3 },
-      { name: 'Medical Alcohol', required: 3 },
-      { name: 'Forehead Thermometer', required: 3 },
-      { name: 'Gunpowder', required: 3 },
-    ],
-    purple: [
-      { name: 'HiFi Sound Card', required: 3 },
-      { name: 'Data Military Intel', required: 3 },
-      { name: 'ASUS Motherboard', required: 3 },
-      { name: 'Radio', required: 3 },
-      { name: 'SSD', required: 6 },
-      { name: 'RAM', required: 6 },
-      { name: 'Ahsarah Specialty Flask', required: 1 },
-      { name: 'Antler Wall Decoration', required: 2 },
-      { name: 'Sarah Guard Confidential Files', required: 4 },
-      { name: 'Blood Pressure Meter', required: 2 },
-      { name: 'Ahsarah Glamour Hookah', required: 2 },
-    ],
-    gold: [
-      { name: "Saeed's Pocket Watch", required: 1 },
-      { name: 'Coffee', required: 2 },
-      { name: 'SLR Camera', required: 2 },
-      { name: 'Graphics Card', required: 1 },
-      { name: 'Olivia Champagne', required: 1 },
-      { name: 'Cell Phone', required: 2 },
-      { name: 'CPU', required: 6 },
-      { name: 'Merit Medal', required: 4 },
-      { name: 'Ahsarah Specialty Wine Glass', required: 1 },
-      { name: 'Shiny Pirate Gold Coin', required: 1 },
-      { name: 'Military Explosive', required: 1 },
-      { name: 'Pure Gold Lighter', required: 4 },
-    ],
-  };
-
-  const [inventory, setInventory] = useState(() => {
-    const stored = localStorage.getItem('inventory');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-    return Object.keys(initialInventory).reduce((acc, category) => {
-      acc[category] = initialInventory[category].map(item => ({
-        ...item,
-        current: 0,
-        completed: false,
-      }));
-      return acc;
-    }, {});
-  });
-
-  const handleCurrentChange = (category, index, value) => {
-    const newInventory = { ...inventory };
-    newInventory[category][index].current = Math.max(0, parseInt(value) || 0);
-    newInventory[category][index].completed = 
-      newInventory[category][index].current >= newInventory[category][index].required;
-    localStorage.setItem('inventory', JSON.stringify(newInventory));
-    setInventory(newInventory);
-  };
-
-  const handleCompletedToggle = (category, index) => {
-    const newInventory = { ...inventory };
-    newInventory[category][index].completed = !newInventory[category][index].completed;
-    localStorage.setItem('inventory', JSON.stringify(newInventory));
-    setInventory(newInventory);
-  };
-
-  const getCategoryColor = (category) => {
-    switch(category) {
-      case 'common': return 'bg-green-100';
-      case 'blue': return 'bg-blue-100';
-      case 'purple': return 'bg-purple-100';
-      case 'gold': return 'bg-yellow-100';
-      default: return 'bg-gray-100';
-    }
-  };
-
-  const CategorySection = ({ category, items, color }) => (
-    <Card className={`mb-6 ${color}`}>
-      <CardHeader>
-        <CardTitle className="capitalize">{category} Items</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {items.map((item, index) => (
-            <div key={item.name} className="flex items-center space-x-4">
-              <Checkbox
-                checked={item.completed}
-                onCheckedChange={() => handleCompletedToggle(category, index)}
-                className="h-5 w-5"
-              />
-              <div className="flex-1">
-                <div className="font-medium">{item.name}</div>
-                <div className="text-sm text-gray-500">
-                  Required: {item.required}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Hour Inventory Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root" class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+        <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+            <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+                <div class="max-w-md mx-auto">
+                    <div class="divide-y divide-gray-200">
+                        <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+                            <h1 class="text-2xl font-bold mb-4">Zero Hour Inventory Tracker</h1>
+                            <!-- Common Items -->
+                            <div class="bg-green-100 p-4 rounded-lg mb-4">
+                                <h2 class="font-bold mb-2">Common Items</h2>
+                                <div id="commonItems"></div>
+                            </div>
+                            <!-- Blue Items -->
+                            <div class="bg-blue-100 p-4 rounded-lg mb-4">
+                                <h2 class="font-bold mb-2">Blue Items</h2>
+                                <div id="blueItems"></div>
+                            </div>
+                            <!-- Purple Items -->
+                            <div class="bg-purple-100 p-4 rounded-lg mb-4">
+                                <h2 class="font-bold mb-2">Purple Items</h2>
+                                <div id="purpleItems"></div>
+                            </div>
+                            <!-- Gold Items -->
+                            <div class="bg-yellow-100 p-4 rounded-lg mb-4">
+                                <h2 class="font-bold mb-2">Gold Items</h2>
+                                <div id="goldItems"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <Input
-                type="number"
-                value={item.current}
-                onChange={(e) => handleCurrentChange(category, index, e.target.value)}
-                className="w-20"
-                min="0"
-              />
-              <div className={`w-20 text-center ${
-                item.current >= item.required ? 'text-green-600' : 'text-gray-500'
-              }`}>
-                {item.current}/{item.required}
-              </div>
             </div>
-          ))}
         </div>
-      </CardContent>
-    </Card>
-  );
-
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Zero Hour Inventory Tracker</h1>
-      {Object.entries(inventory).map(([category, items]) => (
-        <CategorySection
-          key={category}
-          category={category}
-          items={items}
-          color={getCategoryColor(category)}
-        />
-      ))}
     </div>
-  );
-};
 
-export default InventoryTracker;
+    <script>
+        // Item data
+        const inventory = {
+            common: [
+                { name: 'Lithium Battery', required: 3 },
+                { name: 'LED Light', required: 2 },
+                { name: 'Printed Circuit Board', required: 3 }
+            ],
+            blue: [
+                { name: 'Bucket of Paint', required: 5 },
+                { name: 'Basic Ammo Production Part', required: 3 },
+                { name: 'Intel Recorder', required: 1 },
+                { name: 'Socket Adapter', required: 3 },
+                { name: 'Military Power Bank', required: 3 },
+                { name: 'Medical Alcohol', required: 3 },
+                { name: 'Forehead Thermometer', required: 3 },
+                { name: 'Gunpowder', required: 3 }
+            ],
+            // Add purple and gold items here
+        };
+
+        // Create item elements
+        function createItemElement(item) {
+            const div = document.createElement('div');
+            div.className = 'flex items-center mb-2';
+            div.innerHTML = `
+                <input type="checkbox" class="mr-2">
+                <span class="flex-1">${item.name}</span>
+                <input type="number" min="0" value="0" class="w-16 px-2 py-1 border rounded">
+                <span class="ml-2">${item.required} required</span>
+            `;
+            return div;
+        }
+
+        // Add items to containers
+        Object.entries(inventory).forEach(([category, items]) => {
+            const container = document.getElementById(`${category}Items`);
+            items.forEach(item => {
+                container.appendChild(createItemElement(item));
+            });
+        });
+
+        // Save to localStorage
+        function saveProgress() {
+            // Add save functionality here
+        }
+    </script>
+</body>
+</html>
