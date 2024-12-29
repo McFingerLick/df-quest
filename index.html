@@ -1,78 +1,22 @@
 import React from 'react';
 
-const ProgressBar = ({ progress, bgColor = "bg-blue-500" }) => (
-  <div className="w-full bg-gray-200 rounded-full h-2.5">
-    <div 
-      className={`h-2.5 rounded-full ${bgColor}`} 
-      style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-    />
-  </div>
-);
-
-const InventoryItem = ({ item, category, index, onCurrentChange }) => (
-  <div
-    className={`p-4 rounded-lg bg-white/50 ${
-      item.completed ? 'bg-green-50' : ''
-    }`}
-  >
-    <div className="flex items-center justify-between">
-      <div>
-        <div className="font-medium">{item.name}</div>
-        <div className="text-sm text-gray-600">
-          Required: {item.required}
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <input
-          type="number"
-          value={item.current || ''}
-          onChange={(e) => onCurrentChange(category, index, e.target.value)}
-          className="w-20 px-2 py-1 border rounded"
-          min="0"
-          max={item.required}
-        />
-        <div className={item.completed ? 'text-green-600' : 'text-gray-600'}>
-          {item.current}/{item.required}
-        </div>
-      </div>
+const ProgressBar = ({ progress, bgColor = "bg-blue-500" }) => {
+  return (
+    <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div 
+        className={`h-2.5 rounded-full ${bgColor}`} 
+        style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+      />
     </div>
-  </div>
-);
+  );
+};
 
-const CategorySection = ({ category, items, isOpen, onToggle, progress, color, progressColor, children }) => (
-  <div className={`mb-6 rounded-lg ${color}`}>
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center">
-          <svg 
-            className={`w-4 h-4 mr-2 transition-transform cursor-pointer ${isOpen ? '' : '-rotate-90'}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-            onClick={onToggle}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-          <h2 className="text-xl font-semibold capitalize">{category} Items</h2>
-        </div>
-        <div className="text-sm">
-          {progress.toFixed(1)}%
-        </div>
-      </div>
-      <ProgressBar progress={progress} bgColor={progressColor} />
-    </div>
-    <div className={`space-y-4 px-4 pb-4 ${isOpen ? '' : 'hidden'}`}>
-      {children}
-    </div>
-  </div>
-);
-
-const InventoryTracker = () => {
+function InventoryTracker() {
   const initialInventory = {
     common: [
       { name: 'Lithium Battery', required: 3 },
       { name: 'LED Light', required: 2 },
-      { name: 'Printed Circuit Board', required: 3 },
+      { name: 'Printed Circuit Board', required: 3 }
     ],
     blue: [
       { name: 'Bucket of Paint', required: 5 },
@@ -82,7 +26,7 @@ const InventoryTracker = () => {
       { name: 'Military Power Bank', required: 3 },
       { name: 'Medical Alcohol', required: 3 },
       { name: 'Forehead Thermometer', required: 3 },
-      { name: 'Gunpowder', required: 3 },
+      { name: 'Gunpowder', required: 3 }
     ],
     purple: [
       { name: 'HiFi Sound Card', required: 3 },
@@ -95,7 +39,7 @@ const InventoryTracker = () => {
       { name: 'Antler Wall Decoration', required: 2 },
       { name: 'Sarah Guard Confidential Files', required: 4 },
       { name: 'Blood Pressure Meter', required: 2 },
-      { name: 'Ahsarah Glamour Hookah', required: 2 },
+      { name: 'Ahsarah Glamour Hookah', required: 2 }
     ],
     gold: [
       { name: "Saeed's Pocket Watch", required: 1 },
@@ -109,8 +53,8 @@ const InventoryTracker = () => {
       { name: 'Ahsarah Specialty Wine Glass', required: 1 },
       { name: 'Shiny Pirate Gold Coin', required: 1 },
       { name: 'Military Explosive', required: 1 },
-      { name: 'Pure Gold Lighter', required: 4 },
-    ],
+      { name: 'Pure Gold Lighter', required: 4 }
+    ]
   };
 
   const [inventory, setInventory] = React.useState(() => {
@@ -122,7 +66,7 @@ const InventoryTracker = () => {
       acc[category] = initialInventory[category].map(item => ({
         ...item,
         current: 0,
-        completed: false,
+        completed: false
       }));
       return acc;
     }, {});
@@ -184,7 +128,7 @@ const InventoryTracker = () => {
         acc[category] = inventory[category].map(item => ({
           ...item,
           current: 0,
-          completed: false,
+          completed: false
         }));
         return acc;
       }, {});
@@ -343,33 +287,70 @@ const InventoryTracker = () => {
         };
 
         return (
-          <CategorySection
-            key={category}
-            category={category}
-            items={items}
-            isOpen={openSections[category]}
-            onToggle={() => setOpenSections(prev => ({
-              ...prev,
-              [category]: !prev[category]
-            }))}
-            progress={calculateCategoryProgress(items)}
-            color={categoryColors[category]}
-            progressColor={progressColors[category]}
-          >
-            {filteredItems.map((item, index) => (
-              <InventoryItem
-                key={item.name}
-                item={item}
-                category={category}
-                index={index}
-                onCurrentChange={handleCurrentChange}
+          <div key={category} className={`mb-6 rounded-lg ${categoryColors[category]}`}>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <svg 
+                    className={`w-4 h-4 mr-2 transition-transform cursor-pointer ${openSections[category] ? '' : '-rotate-90'}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    onClick={() => setOpenSections(prev => ({
+                      ...prev,
+                      [category]: !prev[category]
+                    }))}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <h2 className="text-xl font-semibold capitalize">{category} Items</h2>
+                </div>
+                <div className="text-sm">
+                  {calculateCategoryProgress(items).toFixed(1)}%
+                </div>
+              </div>
+              <ProgressBar 
+                progress={calculateCategoryProgress(items)} 
+                bgColor={progressColors[category]}
               />
-            ))}
-          </CategorySection>
+            </div>
+            <div className={`space-y-4 px-4 pb-4 ${openSections[category] ? '' : 'hidden'}`}>
+              {filteredItems.map((item, index) => (
+                <div
+                  key={item.name}
+                  className={`p-4 rounded-lg bg-white/50 ${
+                    item.completed ? 'bg-green-50' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-gray-600">
+                        Required: {item.required}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="number"
+                        value={item.current || ''}
+                        onChange={(e) => handleCurrentChange(category, index, e.target.value)}
+                        className="w-20 px-2 py-1 border rounded"
+                        min="0"
+                        max={item.required}
+                      />
+                      <div className={item.completed ? 'text-green-600' : 'text-gray-600'}>
+                        {item.current}/{item.required}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         );
       })}
     </div>
   );
-};
+}
 
 export default InventoryTracker;
