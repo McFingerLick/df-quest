@@ -1,17 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const ProgressBar = ({ progress, bgColor = "bg-blue-500" }) => {
-  return (
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
-      <div 
-        className={`h-2.5 rounded-full ${bgColor}`} 
-        style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-      />
-    </div>
-  );
-};
-
+// Main component for the inventory tracking application
 function InventoryTracker() {
+  // Initial inventory data structure
   const initialInventory = {
     common: [
       { name: 'Lithium Battery', required: 3 },
@@ -57,7 +48,8 @@ function InventoryTracker() {
     ]
   };
 
-  const [inventory, setInventory] = React.useState(() => {
+  // State management hooks
+  const [inventory, setInventory] = useState(() => {
     const stored = localStorage.getItem('inventory');
     if (stored) {
       return JSON.parse(stored);
@@ -72,11 +64,12 @@ function InventoryTracker() {
     }, {});
   });
 
-  const [search, setSearch] = React.useState('');
-  const [filter, setFilter] = React.useState('all');
-  const [showSaveAlert, setShowSaveAlert] = React.useState(false);
-  const [openSections, setOpenSections] = React.useState({});
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [showSaveAlert, setShowSaveAlert] = useState(false);
+  const [openSections, setOpenSections] = useState({});
 
+  // Helper functions
   const calculateCategoryProgress = (items) => {
     const totalRequired = items.reduce((sum, item) => sum + item.required, 0);
     const totalCurrent = items.reduce((sum, item) => sum + (item.current || 0), 0);
@@ -95,7 +88,8 @@ function InventoryTracker() {
     return (totalCurrent / totalRequired) * 100;
   };
 
-  React.useEffect(() => {
+  // Effects
+  useEffect(() => {
     const newOpenSections = {};
     Object.entries(inventory).forEach(([category, items]) => {
       const hasMatch = items.some(item =>
@@ -106,6 +100,7 @@ function InventoryTracker() {
     setOpenSections(newOpenSections);
   }, [search, inventory]);
 
+  // Event handlers
   const saveToLocalStorage = (data) => {
     localStorage.setItem('inventory', JSON.stringify(data));
     setShowSaveAlert(true);
@@ -197,6 +192,17 @@ function InventoryTracker() {
     reader.readAsText(file);
   };
 
+  // Progress bar component
+  const ProgressBar = ({ progress, bgColor = "bg-blue-500" }) => (
+    <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div 
+        className={`h-2.5 rounded-full ${bgColor}`} 
+        style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+      />
+    </div>
+  );
+
+  // Render component
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
