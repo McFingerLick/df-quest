@@ -75,14 +75,12 @@ const InventoryTracker = () => {
     const [showSaveAlert, setShowSaveAlert] = React.useState(false);
     const [openSections, setOpenSections] = React.useState({});
 
-    // Calculate progress for a category
     const calculateCategoryProgress = (items) => {
         const totalRequired = items.reduce((sum, item) => sum + item.required, 0);
         const totalCurrent = items.reduce((sum, item) => sum + (item.current || 0), 0);
         return (totalCurrent / totalRequired) * 100;
     };
 
-    // Calculate total progress
     const calculateTotalProgress = () => {
         let totalRequired = 0;
         let totalCurrent = 0;
@@ -95,7 +93,6 @@ const InventoryTracker = () => {
         return (totalCurrent / totalRequired) * 100;
     };
 
-    // Effect to auto-open sections with search matches
     React.useEffect(() => {
         const newOpenSections = {};
         Object.entries(inventory).forEach(([category, items]) => {
@@ -289,9 +286,7 @@ const InventoryTracker = () => {
 
                 return (
                     <div key={category} className={`mb-6 rounded-lg ${categoryColors[category]}`}>
-                        <div 
-                            className="p-4"
-                        >
+                        <div className="p-4">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center">
                                     <svg 
